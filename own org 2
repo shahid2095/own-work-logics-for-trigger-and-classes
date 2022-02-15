@@ -1,0 +1,390 @@
+trigger acc_con on Account (after update) {
+ /*   
+    map<id,list<contact>> Acc_con= new map<id,list<contact>>();
+set<id> con = new set<id>();
+set<id> acc= new set<id>();
+    string email1;
+    list<contact> newcon = new list<contact>();
+    system.debug('acc_con');
+    for(account accid : trigger.new){
+      acc.add(accid.Id); 
+        Acc_con.put(accid.id,null);
+        email1 = accid.Acc_Email__c;
+    }   
+     
+list<contact> conids = [select id,name,accountid,email from contact where accountid in : Acc_con.keySet()];
+     system.debug('acc_con====>'+conids);
+    for(contact cc : conids){
+        newcon.add(cc);
+        Acc_con.put(cc.AccountId,newcon);
+    }
+system.debug('correspoinding con values==>'+Acc_con);
+    
+    */
+ /*   
+    map<id,account> acc_con =  trigger.newmap;
+    map<id,account> acc_opp = new map<id,account>();
+    list<contact> cc = new list<contact>();
+    set<id> accid = new set<id>();
+    
+    
+    for(Opportunity  O : [select id,accountid,StageName from Opportunity where accountid in : acc_con.keySet()]){
+        if(O.StageName == 'Closed Won'){
+            accid.add(O.AccountId);
+        }
+    }
+    system.debug('updateds__accid====>'+accid);
+        if(accid.size()>0 && accid != null){
+            system.debug('if under_____');
+    for(contact c : [select id,name,email,accountid from contact where accountid in : accid]){
+        system.debug('if under_____+++++');
+        c.email = acc_con.get(c.AccountId).Acc_Email__c;
+        cc.add(c);
+         system.debug('updateds====>'+acc_con);
+        
+    }}
+    
+    system.debug('updateds====>'+cc);
+    update cc;
+    
+    
+    
+    
+    
+    
+    
+    
+  */  
+    
+ /*
+map<id,account> acids= trigger.newmap;
+map<id,account> acc_old=trigger.oldmap;
+map<id,list<contact>> con_list = new map<id,list<contact>>();
+map<id,list<Opportunity>> Opp_list = new map<id,list<Opportunity>>();
+    list<opportunity> to_Opp_Update = new list<Opportunity>();
+    list<contact> to_update = new list<contact>();
+    
+    
+list<contact> con =[select id,name,All_Emails__c,accountid from contact where accountid in : acids.keySet()];
+
+    for(contact cn : con){
+        system.debug('cn=====>');
+        if(con_list.containsKey(cn.AccountId)){
+            system.debug('containsKey_cn=====>'+con_list);
+            list<contact> add_con = new list<contact>();
+            add_con = con_list.get(cn.AccountId);
+            add_con.add(cn);
+            con_list.put(cn.AccountId, add_con);
+            
+        }else{
+            list<contact> add_con1 = new list<contact>();
+            add_con1.add(cn);
+            con_list.put(cn.AccountId, add_con1);
+            system.debug('add_con1_containsKey_cn=====>'+add_con1);
+        }
+        
+        
+        list<Opportunity> Opp = [select id,name,Opp_All_Emails__c,accountid from Opportunity where accountid in : acids.keySet()];
+        
+        for(opportunity Opps : Opp){
+            if(Opp_list.containsKey(Opps.AccountId)){
+                list<opportunity> all_list = new list<Opportunity>();
+                all_list = Opp_list.get(Opps.AccountId);
+                all_list.add(Opps);
+                Opp_list.put(Opps.AccountId, All_list);
+            }else{
+                list<Opportunity> Opp_list1 = new list<Opportunity>();
+                Opp_list1.add(Opps);
+                Opp_list.put(Opps.AccountId, Opp_list1);
+            }
+        }
+        
+        
+        for(account acc : trigger.new){
+            if(acc_old.get(acc.id).All_Emails__c != acids.get(acc.id).All_Emails__c){
+                system.debug('acc_');
+                if(con_list.containsKey(acc.Id)){
+                    system.debug('acc_containsKey');
+                    list<contact> to_be_update = con_list.get(acc.id);
+                    system.debug('acc_containsKey_to_be_update==>'+to_be_update);
+                    for(contact c : to_be_update){
+                        system.debug('c====>'+c);
+                        c.All_Emails__c = acc.All_Emails__c;
+                        to_update.add(c);
+                    }
+                    
+                    
+                }
+                
+            }
+        }
+        update to_update;
+       
+        
+    }
+  
+    
+    */
+    /*
+map<id,account> acids= trigger.newmap;
+map<id,account> acc_old=trigger.oldmap;
+    set<id> con_id = new set<id>();
+    list<contact> update_list = new list<contact>();
+    
+    if(trigger.isupdate){
+        
+        list<contact> con = [select id,name,accountid,All_Emails__c from contact where accountid in : acids.keySet()];
+        
+        for(contact c : con){
+            if(c.AccountId != null){
+                c.All_Emails__c += acids.get(c.AccountId).All_Emails__c;
+                update_list.add(c);
+            }
+        }
+        update update_list;
+   /*     for(contact cc : [select id,name,accountid from contact where accountid in : con_id]){
+            
+        }
+        
+
+    
+    
+    
+    
+    
+    } */
+    
+    
+map<id,account> acc = trigger.newmap;
+map<id,account> old_ac = new map<id,account>();
+    map<id,list<contact>> con_list = new map<id,list<contact>>();
+    set<id> acc_ids = new set<id>();
+    list<contact> con_update = new list<contact>();
+    list<contact> final_con_update = new list<contact>();
+    set<contact> set_list = new set<contact>();
+    map<id,list<contact>> final_to_be = new map<id,list<contact>>();
+    
+   
+   
+
+list<contact> con = [select id,name,accountid,Department from contact where accountid in : acc.keySet()];
+system.debug('_con===>'+con);
+ /*   for(contact cc : con){
+        cc.Department = acc.get(cc.AccountId).Department__c;
+        con_update.add(cc);
+    }
+    system.debug('updated values====>'+con_update);
+    update con_update;
+
+*/
+    
+    for(contact c : con){
+        if(con_list.containsKey(c.accountid)){
+            list<contact> get_con = con_list.get(c.AccountId);
+            get_con.add(c);
+            con_list.put(c.AccountId, get_con);
+            system.debug('get_con===>'+get_con);
+        }else{
+            list<contact> dup = new list<contact>();
+            dup.add(c);
+            con_list.put(c.AccountId, dup);
+            system.debug('dup===>'+dup);
+        }
+        
+        for(account accc : trigger.new){
+            system.debug('accc===>');
+             if(trigger.newmap.get(accc.Id).Rating != trigger.oldmap.get(accc.Id).rating){
+                 system.debug('newmap===>');
+                 if(con_list.containsKey(accc.id)){
+                     system.debug('newmapcon_list===>');
+                     list<contact> to_update = con_list.get(accc.Id);
+                     for(contact cc : to_update){
+                         system.debug('Department__c===>'+accc.Department__c);
+                         cc.Department = accc.Department__c;
+                         set_list.add(cc); 
+                         final_con_update.addAll(set_list);
+                         system.debug('final_con_update===>'+final_con_update);
+                     }
+                     
+                 }
+            
+        }
+            try{
+                
+                update final_con_update;
+            }catch(Exception e){
+            system.debug('error message==='+e);
+        }
+
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+}
+
+****************************************
+trigger equal_Amount on Account (after update) {
+
+    map<id,list<contact>> conids = new map<id,list<contact>>();
+    decimal amount;
+    integer size;
+    list<account> accid = new list<account>();
+     list<contact> cc = new list<contact>(); 
+    
+    for(account acc : trigger.new){
+        conids.put(acc.id,null);
+        amount = acc.Total_Amount__c;
+        conids.remove(null);
+        
+    }
+    system.debug('accountids===>>'+conids);
+    
+    list<contact> con = [SELECT Id, Name, Email,Amount__c, Account.Id FROM Contact where account.id In: conids.keySet()];
+    system.debug('contactsids===>>'+con);
+    size = con.size();
+    amount = amount/size;
+    system.debug('size===>>'+size);
+     system.debug('amount===>>'+amount);
+ 
+    try{
+    for(contact con : con){
+        system.debug('amount===>> Loop');
+        con.Amount__c = amount;
+        cc.add(con);
+        
+    }
+    
+update cc;
+    }catch(Exception e){
+            system.debug('error message==='+e);
+        }
+    
+}
+
+************************************
+trigger accAcc on Account (after insert,after update) {
+  /*  map<id,account> accid = trigger.newmap;
+    list<contact> updatecon = new list<contact>();
+    
+   list<contact> con=[select id,accountid,phone from contact where accountid in : accid.keySet()];
+    for(contact c:con){
+        c.Phone = accid.get(c.AccountId).phone;
+        updatecon.add(c);
+        
+    }
+    update updatecon;  */
+    
+ /*   map<id,account> accid=trigger.newmap;
+    
+    list<contact> con =[select id,accountid,Amount__c from contact where accountid in : accid.keySet()];
+    list<Decimal> sum=new list<Decimal>();
+    for(contact c : con){
+        sum.add(c.Amount__c);
+             
+    }
+    system.debug('total sum ='+sum);
+    
+    
+
+    
+    
+    */
+map<account,list<contact>> Acc_con= new map<account,list<contact>>();
+set<id> con = new set<id>();
+    
+    for(account acc : trigger.new){
+        
+    }   
+    
+    
+
+}
+
+******************************************
+trigger AddRelatedRecords on Account (after insert, after update) {
+     List<Opportunity> oppList = new List<Opportunity>();
+    
+    // Add an opportunity for each account if it doesn't already have one.
+    // Iterate over accounts that are in this trigger but that don't have opportunities.
+    for (Account a : [SELECT Id,Name FROM Account
+                     WHERE Id IN :Trigger.New AND
+                     Id NOT IN (SELECT AccountId FROM Opportunity)]) {
+        // Add a default opportunity for this account
+        oppList.add(new Opportunity(Name=a.Name + ' Opportunity',
+                                   StageName='Prospecting',
+                                   CloseDate=System.today().addMonths(1),
+                                   AccountId=a.Id)); 
+    }
+    
+    if (oppList.size() > 0) {
+        insert oppList;
+    }
+
+}
+*******************
+trigger acNew on Account (after insert,after update) {
+  /*  map<id,account> mapc = trigger.newmap;
+    list<contact> conupdate = new list<contact>();
+    list<contact> con = [select id,name,AccountId from contact where accountid in : mapc.keySet()];
+    system.debug('con=====>>'+con);
+    for(contact c : con){
+      c.Department = mapc.get(c.accountid).Department__c;
+       conupdate.add(c);
+        system.debug('dempt===>'+conupdate);
+    }
+    update conupdate;*/
+}
+
+*****************************
+trigger PreventToDel on Account (before Delete) {
+    map<id,account> acid = new map<id,account>([SELECT Id,(SELECT Id,AccountId FROM Opportunities) FROM Account WHERE Id IN :Trigger.old]);
+    
+    for(account a : trigger.old){
+        system.debug('allll===>'+acid.get(a.id).opportunities.size());
+        if(acid.get(a.id).opportunities.size()>0){
+            system.debug('id aklll');
+            
+        }
+        
+    }
+    
+    
+
+}
+
+***********************
+trigger Packlist_1 on Account (After insert,after update) {
+
+/*    Account[] Ac=null;
+    if(trigger.isInsert && trigger.isUpdate){
+        Ac = trigger.new;
+    }
+    
+    map<id,Account> acc = new map<id,Account>();
+    for(Account a:trigger.new){
+        acc.put(a.id,a);
+    }
+    list<contact> upcon = new list<contact>();
+    list<contact> con = [Select accountid,leadsource from contact where accountid in : acc.keySet()];
+    system.debug('con====>>'+con);
+    for(Contact con:con){
+    con.LeadSource = acc.get(con.AccountId).AccountSource;
+        upcon.add(con);
+     }
+    system.debug('con====>>'+upcon);
+    if(upcon.size()>0) upsert upcon;
+    */
+}
+
+
+*****************
