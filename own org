@@ -1,0 +1,162 @@
+trigger ac111 on Account (after insert,after update) {
+    map<id,account> accid = trigger.newmap;
+    map<id,account> olacc = trigger.oldmap;
+    list<contact> conup = new list<contact>();
+    
+    
+   list<contact> con=[select id,LastName,accountid from contact where accountid in : accid.keyset()];
+    
+    for(contact c : con){
+        if(accid.get(c.AccountId).BillingStreet__c != olacc.get(c.accountid).BillingStreet__c || 
+        accid.get(c.AccountId).Email__c != olacc.get(c.AccountId).Email__c){
+            
+            c.OtherStreet = accid.get(c.AccountId).BillingStreet__c;
+            c.Email = accid.get(c.AccountId).Email__c;
+            conup.add(c);
+            
+        }
+    }
+    update conup;
+
+}
+****************************************
+trigger acNew on Account (after delete,after undelete) {
+    map<id,account> mapAcc = trigger.newmap;
+    map<id,account> mapOldAcc = trigger.oldmap;
+    list<contact> conDel = new list<contact>();
+    
+    if(trigger.isDelete){
+        system.debug('delete');
+    list<contact> con = [select id,name,accountid from contact where accountid in : mapOldAcc.keySet()];
+    system.debug('mapOldAcc===>'+mapOldAcc+'con==>>'+con);
+    
+    if(trigger.isDelete){
+        
+        for(contact cn : con){
+            contact c = new contact();
+            c.id = cn.id;
+            conDel.add(c);
+        }
+        Delete conDel;
+    }}
+    *****************************************************
+    trigger trg6 on Account (before insert,before update) {
+    if(trigger.isUpdate){
+        for(Account s : trigger.old){
+            if(s.AnnualRevenue != null){
+                s.addError('Denied');
+            }
+        }
+    }
+
+}
+
+*******************************************
+trigger ac11 on Account (after insert,after update) {
+    map<string,account> accid = new map<string,account>();
+    map<id,list<contact>> conid = new map<id,list<contact>>();
+    list<contact> conup = new list<contact>();
+    list<contact> finlupdt = new list<contact>();
+    
+    for(account ac : trigger.new){
+        accid.put(ac.id,ac);
+        system.debug('account id==>'+accid);
+    }
+    list<contact> con = [select id,AccountId,firstName,LastName,Department from contact where accountid in : accid.keySet()];
+    system.debug('all contact list===>'+con);
+    list<contact> updat = new list<contact>();
+    for(contact cc : con){
+        if(conid.get(cc.AccountId) != null){
+            conup = conid.get(cc.AccountId);
+            conup.add(cc);
+            
+            
+        }else{
+            
+            conup.add(cc);
+        }
+        conid.put(cc.AccountId,conup);
+        
+        
+        account cs = new account();
+        for(id m : conid.keySet()){
+            list<contact> c3 = conid.get(m);
+            for(contact ccc : c3){
+                cs=accid.get(ccc.accountid);
+                ccc.Department = cs.Dept__c;
+                    finlupdt.add(ccc);
+           }
+            
+            
+        }
+        upsert finlupdt;
+        
+        
+        
+    }
+    
+
+}
+*******************************************************
+trigger ac1 on Account (after insert,after update) {
+  map<string,account> acids =new map<string,account>();
+    map<id,list<contact>> conids = new map<id,list<contact>>();
+      
+    for(account ac : trigger.new){
+        acids.put(ac.id,ac);
+        system.debug('acids==>'+acids);
+    }
+    list<contact> con=[select id,AccountId,Department from contact where AccountId IN : acids.keySet()];
+    system.debug('contacts==>'+con);
+    list<contact> updt=new list<contact>();
+        for(contact c1 : con){
+            
+            if(conids.get(c1.AccountId)!=null){
+                updt = conids.get(c1.Accountid);
+                updt.add(c1);
+                system.debug('updt==>>'+updt);
+                
+                
+                
+            }else{
+                updt.add(c1);
+                system.debug('updt else==>>'+updt);
+            }
+            conids.put(c1.Accountid,updt);
+            system.debug('conids====>'+conids);
+        }
+    account cs=new account();
+    for(id m : conids.keySet()){
+        system.debug('for map====>'+m);
+        list<contact> c = conids.get(m);
+            system.debug('c===>'+c);
+        for(contact cc : c){
+            cs = acids.get(cc.AccountId);
+                cc.Department=cs.Dept__c;
+        }
+    }
+    
+    list<contact> finlupdt = new list<contact>();
+    for(id a : conids.keyset()){
+        system.debug('a===> '+a);
+        list<contact> c2 = conids.get(a);
+        system.debug('c2====>>>'+c2);
+        for(contact b : c2){
+            finlupdt.add(b);
+            
+        }
+        
+    }
+    if(finlupdt.size()>0)upsert finlupdt;
+    
+    
+    
+    
+    
+        
+        
+    
+    
+    }
+    
+    
