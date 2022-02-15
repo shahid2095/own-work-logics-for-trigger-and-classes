@@ -1,0 +1,96 @@
+trigger Targeting_Logic on School__c ( after update) {
+    
+    map<id,School__c> new_values = trigger.newmap;
+    map<id,School__c> old_values = trigger.oldmap;
+    /*
+    map<id,list<Student1__c>> Child_Records = new map<id,list<Student1__c>>();
+    Integer totalSize = 0;
+    
+    list<Student1__c> std = [select id,name,Course_1_std__c,Course_2_std__c,Class_Enrolled__c,School__c,Active__c from Student1__c where 
+                            School__c in : new_values.keySet()];
+    system.debug('Entering=====>>'+std);
+    
+    for(Student1__c child_std : std){
+        if( Child_Records.containsKey(child_std.School__c)){
+        system.debug('child_record fst=='+Child_Records);
+            list<Student1__c> new_list = new list<Student1__c>();
+            new_list = child_Records.get(child_std.School__c);
+            system.debug('containsKey====='+new_list);
+            new_list.add(child_std);
+            system.debug('new_list====='+new_list);
+            child_Records.put(child_std.School__c, new_list);
+        }else{
+            list<Student1__c> new_list1 = new list<Student1__c>();
+            new_list1.add(child_std);
+            child_records.put(child_std.School__c, new_list1);
+        system.debug('new_list1==>>'+new_list1);
+            
+        }
+        for(Student1__c[] std_size: child_records.values()){
+            totalSize = std_size.size();
+        }
+        system.debug('totalSize==>>'+totalSize);
+        
+    }
+    list<Student1__c> to_update = new list<Student1__c>();
+    for(School__c update_std : trigger.new){
+        system.debug('school loop===');
+        if(old_values.get(update_std.id).Course_1__c != new_values.get(update_std.id).Course_1__c){
+            if(child_records.containsKey(update_std.id)){
+                list<Student1__c> update_std_list = child_records.get(update_std.id);
+                for(Student1__c update_list : update_std_list){
+                    update_list.Course_1_std__c = update_std.Course_1__c;
+                    update_list.Course_2_std__c = update_std.Course_2__c;
+                    to_update.add(update_list);
+                }
+                
+                
+            }
+        }
+    }
+    system.debug('update final list ====='+to_update);
+     update to_update;
+    
+    
+    set<id> ac =new set<id>();
+    list<School__c> update_list = new list<School__c>();
+    if(trigger.isupdate){
+        for(School__c acc : trigger.new){
+            if(old_values.get(acc.Id).Course_1__c != new_values.get(acc.Id).Course_1__c){
+                ac.add(acc.Id);
+            }
+        }
+        list<School__c> rec = [select id,Course_1__c,Status__c from School__c where id in : ac];
+        
+        for(School__c ss : rec){
+            if(ss.Status__c == 'Not started' || ss.Status__c == 'In progress'){
+                 ss.Status__c = 'Complated';
+            update_list.add(ss);
+            }
+           
+            
+        }
+        update update_list;
+    }
+    
+
+    */
+    map<id,School__c> acc = trigger.newmap;
+    map<id,School__c> old_acc = trigger.oldmap;
+    
+    
+    list<School__c> duplist = [select id,name,School_Phone__c from School__c];
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+}
