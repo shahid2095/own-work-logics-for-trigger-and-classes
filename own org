@@ -158,5 +158,29 @@ trigger ac1 on Account (after insert,after update) {
     
     
     }
+  *********************
+  trigger Opp on Opportunity (after insert,after update) {
     
+    set<string> ac = new set<string>();
+    set<id> acids = new set<id>();
+    List<Account> accountsToUpdate=new List<Account>();
+    for(opportunity op : trigger.new){
+        ac.add(op.accountid);
+        system.debug('accountid===>'+ac);
+    }
+    map<id,account> acd = new map<id,account>([select id, name,Total_Opp_Amount__c from account where id in : ac]);
+    system.debug('acd====>'+acd);
+    list<account> acc = [select id, name,Total_Opp_Amount__c from account where id in : ac];
+    AggregateResult[]  groupResult = [select AccountId,SUM(Amount__c)amt from Opportunity  where Accountid in : ac group by AccountId];
+    system.debug('groupResult===>>>>'+groupResult);
+    for(AggregateResult R : groupResult)
+    {for(account ac: acc){
+        
+        ac.Total_Opp_Amount__c = (Decimal)R.get('amt');
+        
+        
+    }
+     update acc;
+        
+    }
     
